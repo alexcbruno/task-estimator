@@ -38,6 +38,11 @@ export const CRITERIA: Criterion[] = [
     points: 1,
   },
   {
+    id: "new-image-assets",
+    label: "Will there be new illustrations, 3D images, or animations?",
+    points: 2,
+  },
+  {
     id: "waiting-on-info",
     label: "Am I waiting on information from anyone?",
     points: 2,
