@@ -7,7 +7,7 @@ export interface Criterion {
 // Edit this array to add, remove, or reweight criteria.
 // Point values are hidden from the user during estimation.
 export const CRITERIA: Criterion[] = [
-  { id: "net-new", label: "Requires brand new design work", points: 2 },
+  { id: "net-new", label: "Requires brand new flows or components", points: 2 },
   {
     id: "affected-users",
     label: "Affects multiple user types",
@@ -38,7 +38,7 @@ export const CRITERIA: Criterion[] = [
   },
   {
     id: "new-image-assets",
-    label: "Requires new illustrations, 3D images, or animations?",
+    label: "Requires new illustrations, 3D images, or animations",
     points: 2,
   },
   {
