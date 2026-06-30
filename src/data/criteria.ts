@@ -7,7 +7,6 @@ export interface Criterion {
 // Edit this array to add, remove, or reweight criteria.
 // Point values are hidden from the user during estimation.
 export const CRITERIA: Criterion[] = [
-  { id: "base-value", label: "Task is worth tracking", points: 1 },
   { id: "net-new", label: "Brand new design work", points: 2 },
   {
     id: "affected-users",

@@ -31,10 +31,6 @@ const INTENSITY_LEVELS: { value: Intensity; label: string }[] = [
   { value: 'high', label: 'High' },
 ]
 
-// The first criterion is always checked — tracking a task at all is the baseline.
-const REQUIRED_ID = CRITERIA[0].id
-const defaultSelections = (): Selections => ({ [REQUIRED_ID]: 'high' })
-
 // Round to at most 2 decimals and drop trailing zeros for display.
 function fmt(n: number): string {
   return String(Math.round(n * 100) / 100)
@@ -45,39 +41,21 @@ function CriterionRow({
   intensity,
   onToggle,
   onSetIntensity,
-  required,
 }: {
   criterion: Criterion
   intensity: Intensity | undefined
   onToggle: () => void
   onSetIntensity: (level: Intensity) => void
-  required?: boolean
 }) {
   return (
-    <div
-      className={cn(
-        'flex items-start justify-between gap-3 py-1 min-h-[28px]',
-        required && 'opacity-50 cursor-not-allowed'
-      )}
-    >
-      <label
-        className={cn(
-          'flex items-start gap-3 group flex-1 min-w-0',
-          required ? 'cursor-not-allowed' : 'cursor-pointer'
-        )}
-      >
+    <div className="flex items-start justify-between gap-3 py-1 min-h-[28px]">
+      <label className="flex items-start gap-3 group flex-1 min-w-0 cursor-pointer">
         <Checkbox
           checked={!!intensity}
           onCheckedChange={onToggle}
-          disabled={required}
-          className={cn('mt-0.5', required && 'disabled:opacity-100')}
+          className="mt-0.5"
         />
-        <span
-          className={cn(
-            'text-sm',
-            !required && 'group-hover:underline underline-offset-2'
-          )}
-        >
+        <span className="text-sm group-hover:underline underline-offset-2">
           {criterion.label}
         </span>
       </label>
@@ -93,15 +71,12 @@ function CriterionRow({
           <button
             key={level.value}
             type="button"
-            disabled={required}
             onClick={() => onSetIntensity(level.value)}
             className={cn(
               'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0',
-              required && 'cursor-not-allowed',
               intensity === level.value
                 ? 'bg-black text-white'
-                : 'bg-white text-black',
-              !required && intensity !== level.value && 'hover:bg-gray-100'
+                : 'bg-white text-black hover:bg-gray-100'
             )}
           >
             {level.label}
@@ -116,7 +91,7 @@ export default function App() {
   const [view, setView] = useState<View>('entry')
   const [tasks, setTasks] = useState<Task[]>([])
   const [taskName, setTaskName] = useState('')
-  const [selections, setSelections] = useState<Selections>(defaultSelections)
+  const [selections, setSelections] = useState<Selections>({})
   const [expandedTask, setExpandedTask] = useState<number | null>(null)
   const [showConfirmReset, setShowConfirmReset] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -126,7 +101,7 @@ export default function App() {
   function saveAndNext() {
     setTasks(prev => [...prev, { name: taskName.trim(), selections }])
     setTaskName('')
-    setSelections(defaultSelections())
+    setSelections({})
   }
 
   function saveAndFinish() {
@@ -137,7 +112,6 @@ export default function App() {
 
   // Toggle a criterion in the in-progress entry. Defaults to "high" when checked.
   function toggleCriterion(id: string) {
-    if (id === REQUIRED_ID) return
     setSelections(prev => {
       if (prev[id]) {
         const { [id]: _removed, ...rest } = prev
@@ -152,7 +126,6 @@ export default function App() {
   }
 
   function toggleTaskCriterion(taskIndex: number, id: string) {
-    if (id === REQUIRED_ID) return
     setTasks(prev =>
       prev.map((task, i) => {
         if (i !== taskIndex) return task
@@ -188,7 +161,7 @@ export default function App() {
   function handleStartOver() {
     setTasks([])
     setTaskName('')
-    setSelections(defaultSelections())
+    setSelections({})
     setExpandedTask(null)
     setShowConfirmReset(false)
     setView('entry')
@@ -246,7 +219,6 @@ export default function App() {
                           onSetIntensity={level =>
                             setTaskIntensity(i, criterion.id, level)
                           }
-                          required={criterion.id === REQUIRED_ID}
                         />
                       ))}
                     </div>
@@ -341,7 +313,6 @@ export default function App() {
                 intensity={selections[criterion.id]}
                 onToggle={() => toggleCriterion(criterion.id)}
                 onSetIntensity={level => setIntensity(criterion.id, level)}
-                required={criterion.id === REQUIRED_ID}
               />
             ))}
           </div>
