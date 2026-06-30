@@ -54,43 +54,60 @@ function CriterionRow({
   required?: boolean
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 py-1">
+    <div
+      className={cn(
+        'flex items-start justify-between gap-3 py-1 min-h-[28px]',
+        required && 'opacity-50 cursor-not-allowed'
+      )}
+    >
       <label
         className={cn(
           'flex items-start gap-3 group flex-1 min-w-0',
-          required ? 'cursor-default' : 'cursor-pointer'
+          required ? 'cursor-not-allowed' : 'cursor-pointer'
         )}
       >
         <Checkbox
           checked={!!intensity}
           onCheckedChange={onToggle}
           disabled={required}
-          className="mt-0.5"
+          className={cn('mt-0.5', required && 'disabled:opacity-100')}
         />
-        <span className="text-sm group-hover:underline underline-offset-2">
+        <span
+          className={cn(
+            'text-sm',
+            !required && 'group-hover:underline underline-offset-2'
+          )}
+        >
           {criterion.label}
         </span>
       </label>
 
-      {intensity && (
-        <div className="shrink-0 flex border border-black">
-          {INTENSITY_LEVELS.map(level => (
-            <button
-              key={level.value}
-              type="button"
-              onClick={() => onSetIntensity(level.value)}
-              className={cn(
-                'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0 transition-colors',
-                intensity === level.value
-                  ? 'bg-black text-white'
-                  : 'bg-white text-black hover:bg-gray-100'
-              )}
-            >
-              {level.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Always reserve space for the intensity group so the label wraps consistently. */}
+      <div
+        className={cn(
+          'shrink-0 flex border border-black',
+          !intensity && 'invisible pointer-events-none'
+        )}
+      >
+        {INTENSITY_LEVELS.map(level => (
+          <button
+            key={level.value}
+            type="button"
+            disabled={required}
+            onClick={() => onSetIntensity(level.value)}
+            className={cn(
+              'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0 transition-colors',
+              required && 'cursor-not-allowed',
+              intensity === level.value
+                ? 'bg-black text-white'
+                : 'bg-white text-black',
+              !required && intensity !== level.value && 'hover:bg-gray-100'
+            )}
+          >
+            {level.label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
