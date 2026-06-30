@@ -31,6 +31,10 @@ const INTENSITY_LEVELS: { value: Intensity; label: string }[] = [
   { value: 'high', label: 'High' },
 ]
 
+// The first criterion is always checked — tracking a task at all is the baseline.
+const REQUIRED_ID = CRITERIA[0].id
+const defaultSelections = (): Selections => ({ [REQUIRED_ID]: 'high' })
+
 // Round to at most 2 decimals and drop trailing zeros for display.
 function fmt(n: number): string {
   return String(Math.round(n * 100) / 100)
@@ -41,18 +45,26 @@ function CriterionRow({
   intensity,
   onToggle,
   onSetIntensity,
+  required,
 }: {
   criterion: Criterion
   intensity: Intensity | undefined
   onToggle: () => void
   onSetIntensity: (level: Intensity) => void
+  required?: boolean
 }) {
   return (
     <div className="flex items-start justify-between gap-3 py-1">
-      <label className="flex items-start gap-3 cursor-pointer group flex-1 min-w-0">
+      <label
+        className={cn(
+          'flex items-start gap-3 group flex-1 min-w-0',
+          required ? 'cursor-default' : 'cursor-pointer'
+        )}
+      >
         <Checkbox
           checked={!!intensity}
           onCheckedChange={onToggle}
+          disabled={required}
           className="mt-0.5"
         />
         <span className="text-sm group-hover:underline underline-offset-2">
@@ -87,7 +99,7 @@ export default function App() {
   const [view, setView] = useState<View>('entry')
   const [tasks, setTasks] = useState<Task[]>([])
   const [taskName, setTaskName] = useState('')
-  const [selections, setSelections] = useState<Selections>({})
+  const [selections, setSelections] = useState<Selections>(defaultSelections)
   const [expandedTask, setExpandedTask] = useState<number | null>(null)
   const [showConfirmReset, setShowConfirmReset] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -97,7 +109,7 @@ export default function App() {
   function saveAndNext() {
     setTasks(prev => [...prev, { name: taskName.trim(), selections }])
     setTaskName('')
-    setSelections({})
+    setSelections(defaultSelections())
   }
 
   function saveAndFinish() {
@@ -108,6 +120,7 @@ export default function App() {
 
   // Toggle a criterion in the in-progress entry. Defaults to "high" when checked.
   function toggleCriterion(id: string) {
+    if (id === REQUIRED_ID) return
     setSelections(prev => {
       if (prev[id]) {
         const { [id]: _removed, ...rest } = prev
@@ -122,6 +135,7 @@ export default function App() {
   }
 
   function toggleTaskCriterion(taskIndex: number, id: string) {
+    if (id === REQUIRED_ID) return
     setTasks(prev =>
       prev.map((task, i) => {
         if (i !== taskIndex) return task
@@ -157,7 +171,7 @@ export default function App() {
   function handleStartOver() {
     setTasks([])
     setTaskName('')
-    setSelections({})
+    setSelections(defaultSelections())
     setExpandedTask(null)
     setShowConfirmReset(false)
     setView('entry')
@@ -215,6 +229,7 @@ export default function App() {
                           onSetIntensity={level =>
                             setTaskIntensity(i, criterion.id, level)
                           }
+                          required={criterion.id === REQUIRED_ID}
                         />
                       ))}
                     </div>
@@ -309,6 +324,7 @@ export default function App() {
                 intensity={selections[criterion.id]}
                 onToggle={() => toggleCriterion(criterion.id)}
                 onSetIntensity={level => setIntensity(criterion.id, level)}
+                required={criterion.id === REQUIRED_ID}
               />
             ))}
           </div>
