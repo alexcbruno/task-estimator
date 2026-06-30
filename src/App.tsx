@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Copy, RotateCcw } from 'lucide-react'
-import { CRITERIA } from './data/criteria'
-import { getPoints, roundUpToFibonacci } from './lib/utils'
+import { CRITERIA, type Criterion } from './data/criteria'
+import {
+  getPoints,
+  roundUpToFibonacci,
+  cn,
+  type Intensity,
+  type Selections,
+} from './lib/utils'
 import { Checkbox } from './components/ui/checkbox'
 import {
   Dialog,
@@ -14,16 +20,74 @@ import './index.css'
 
 interface Task {
   name: string
-  selectedCriteria: string[]
+  selections: Selections
 }
 
 type View = 'entry' | 'results'
+
+const INTENSITY_LEVELS: { value: Intensity; label: string }[] = [
+  { value: 'low', label: 'Low' },
+  { value: 'med', label: 'Med' },
+  { value: 'high', label: 'High' },
+]
+
+// Round to at most 2 decimals and drop trailing zeros for display.
+function fmt(n: number): string {
+  return String(Math.round(n * 100) / 100)
+}
+
+function CriterionRow({
+  criterion,
+  intensity,
+  onToggle,
+  onSetIntensity,
+}: {
+  criterion: Criterion
+  intensity: Intensity | undefined
+  onToggle: () => void
+  onSetIntensity: (level: Intensity) => void
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 py-1">
+      <label className="flex items-start gap-3 cursor-pointer group flex-1 min-w-0">
+        <Checkbox
+          checked={!!intensity}
+          onCheckedChange={onToggle}
+          className="mt-0.5"
+        />
+        <span className="text-sm group-hover:underline underline-offset-2">
+          {criterion.label}
+        </span>
+      </label>
+
+      {intensity && (
+        <div className="shrink-0 flex border border-black">
+          {INTENSITY_LEVELS.map(level => (
+            <button
+              key={level.value}
+              type="button"
+              onClick={() => onSetIntensity(level.value)}
+              className={cn(
+                'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0 transition-colors',
+                intensity === level.value
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black hover:bg-gray-100'
+              )}
+            >
+              {level.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function App() {
   const [view, setView] = useState<View>('entry')
   const [tasks, setTasks] = useState<Task[]>([])
   const [taskName, setTaskName] = useState('')
-  const [selectedCriteria, setSelectedCriteria] = useState<string[]>([])
+  const [selections, setSelections] = useState<Selections>({})
   const [expandedTask, setExpandedTask] = useState<number | null>(null)
   const [showConfirmReset, setShowConfirmReset] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -31,41 +95,58 @@ export default function App() {
   const canSubmit = taskName.trim().length > 0
 
   function saveAndNext() {
-    setTasks(prev => [...prev, { name: taskName.trim(), selectedCriteria }])
+    setTasks(prev => [...prev, { name: taskName.trim(), selections }])
     setTaskName('')
-    setSelectedCriteria([])
+    setSelections({})
   }
 
   function saveAndFinish() {
-    const finalTasks = [...tasks, { name: taskName.trim(), selectedCriteria }]
+    const finalTasks = [...tasks, { name: taskName.trim(), selections }]
     setTasks(finalTasks)
     setView('results')
   }
 
+  // Toggle a criterion in the in-progress entry. Defaults to "high" when checked.
   function toggleCriterion(id: string) {
-    setSelectedCriteria(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    )
+    setSelections(prev => {
+      if (prev[id]) {
+        const { [id]: _removed, ...rest } = prev
+        return rest
+      }
+      return { ...prev, [id]: 'high' }
+    })
   }
 
-  function updateTaskCriteria(taskIndex: number, criterionId: string) {
+  function setIntensity(id: string, level: Intensity) {
+    setSelections(prev => ({ ...prev, [id]: level }))
+  }
+
+  function toggleTaskCriterion(taskIndex: number, id: string) {
     setTasks(prev =>
       prev.map((task, i) => {
         if (i !== taskIndex) return task
-        const has = task.selectedCriteria.includes(criterionId)
-        return {
-          ...task,
-          selectedCriteria: has
-            ? task.selectedCriteria.filter(x => x !== criterionId)
-            : [...task.selectedCriteria, criterionId],
+        if (task.selections[id]) {
+          const { [id]: _removed, ...rest } = task.selections
+          return { ...task, selections: rest }
         }
+        return { ...task, selections: { ...task.selections, [id]: 'high' } }
       })
+    )
+  }
+
+  function setTaskIntensity(taskIndex: number, id: string, level: Intensity) {
+    setTasks(prev =>
+      prev.map((task, i) =>
+        i === taskIndex
+          ? { ...task, selections: { ...task.selections, [id]: level } }
+          : task
+      )
     )
   }
 
   function handleCopy() {
     const lines = tasks.map(task => {
-      const fib = roundUpToFibonacci(getPoints(task.selectedCriteria))
+      const fib = roundUpToFibonacci(getPoints(task.selections))
       return `${task.name}: ${fib}`
     })
     navigator.clipboard.writeText(lines.join('\n'))
@@ -76,7 +157,7 @@ export default function App() {
   function handleStartOver() {
     setTasks([])
     setTaskName('')
-    setSelectedCriteria([])
+    setSelections({})
     setExpandedTask(null)
     setShowConfirmReset(false)
     setView('entry')
@@ -85,7 +166,7 @@ export default function App() {
   // ── Results view ──────────────────────────────────────────────────────────────
   if (view === 'results') {
     const totalFib = tasks.reduce(
-      (sum, t) => sum + roundUpToFibonacci(getPoints(t.selectedCriteria)),
+      (sum, t) => sum + roundUpToFibonacci(getPoints(t.selections)),
       0
     )
 
@@ -101,7 +182,7 @@ export default function App() {
 
           <div className="border-t-2 border-black">
             {tasks.map((task, i) => {
-              const rawPts = getPoints(task.selectedCriteria)
+              const rawPts = getPoints(task.selections)
               const fibPts = roundUpToFibonacci(rawPts)
               const isExpanded = expandedTask === i
 
@@ -113,7 +194,7 @@ export default function App() {
                   >
                     <span className="font-medium truncate pr-4">{task.name}</span>
                     <span className="shrink-0 flex items-center gap-3 text-sm">
-                      <span className="text-gray-400">{rawPts} pts</span>
+                      <span className="text-gray-400">{fmt(rawPts)} pts</span>
                       <span className="font-bold">{fibPts} pts</span>
                       {isExpanded ? (
                         <ChevronUp className="h-4 w-4" />
@@ -124,18 +205,17 @@ export default function App() {
                   </button>
 
                   {isExpanded && (
-                    <div className="pb-4 pt-2 px-4 space-y-2 border-t border-dashed border-black bg-gray-50">
+                    <div className="pb-4 pt-2 px-4 space-y-1 border-t border-dashed border-black bg-gray-50">
                       {CRITERIA.map(criterion => (
-                        <label
+                        <CriterionRow
                           key={criterion.id}
-                          className="flex items-center gap-3 cursor-pointer py-0.5"
-                        >
-                          <Checkbox
-                            checked={task.selectedCriteria.includes(criterion.id)}
-                            onCheckedChange={() => updateTaskCriteria(i, criterion.id)}
-                          />
-                          <span className="text-sm">{criterion.label}</span>
-                        </label>
+                          criterion={criterion}
+                          intensity={task.selections[criterion.id]}
+                          onToggle={() => toggleTaskCriterion(i, criterion.id)}
+                          onSetIntensity={level =>
+                            setTaskIntensity(i, criterion.id, level)
+                          }
+                        />
                       ))}
                     </div>
                   )}
@@ -221,20 +301,15 @@ export default function App() {
           <label className="block text-xs font-bold uppercase tracking-widest mb-3">
             Criteria
           </label>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {CRITERIA.map(criterion => (
-              <label
+              <CriterionRow
                 key={criterion.id}
-                className="flex items-center gap-3 cursor-pointer group py-0.5"
-              >
-                <Checkbox
-                  checked={selectedCriteria.includes(criterion.id)}
-                  onCheckedChange={() => toggleCriterion(criterion.id)}
-                />
-                <span className="text-sm group-hover:underline underline-offset-2">
-                  {criterion.label}
-                </span>
-              </label>
+                criterion={criterion}
+                intensity={selections[criterion.id]}
+                onToggle={() => toggleCriterion(criterion.id)}
+                onSetIntensity={level => setIntensity(criterion.id, level)}
+              />
             ))}
           </div>
         </div>

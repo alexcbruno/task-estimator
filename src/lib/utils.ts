@@ -16,8 +16,21 @@ export function roundUpToFibonacci(n: number): number {
   return 21
 }
 
-export function getPoints(selectedIds: string[]): number {
-  return CRITERIA
-    .filter(c => selectedIds.includes(c.id))
-    .reduce((sum, c) => sum + c.points, 0)
+export type Intensity = 'low' | 'med' | 'high'
+
+export const INTENSITY_MULTIPLIER: Record<Intensity, number> = {
+  low: 0.25,
+  med: 0.5,
+  high: 1,
+}
+
+// Map of criterion id -> chosen intensity. A criterion is "checked" iff it has a key.
+export type Selections = Record<string, Intensity>
+
+export function getPoints(selections: Selections): number {
+  return CRITERIA.reduce((sum, c) => {
+    const intensity = selections[c.id]
+    if (!intensity) return sum
+    return sum + c.points * INTENSITY_MULTIPLIER[intensity]
+  }, 0)
 }
