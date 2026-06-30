@@ -96,7 +96,7 @@ function CriterionRow({
             disabled={required}
             onClick={() => onSetIntensity(level.value)}
             className={cn(
-              'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0 transition-colors',
+              'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0',
               required && 'cursor-not-allowed',
               intensity === level.value
                 ? 'bg-black text-white'
