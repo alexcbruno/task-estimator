@@ -283,13 +283,20 @@ export default function App() {
                 <div key={i} className="border-b border-black">
                   <div className="flex items-center">
                     <button
+                      onClick={() => requestDeleteTask(i)}
+                      aria-label={`Remove ${task.name}`}
+                      className="shrink-0 p-3 text-gray-400 hover:text-black transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <button
                       className="flex-1 min-w-0 text-left py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
                       onClick={() => setExpandedTask(isExpanded ? null : i)}
                     >
                       <span className="font-medium truncate pr-4">
                         {task.name}
                       </span>
-                      <span className="shrink-0 flex items-center gap-3 text-sm">
+                      <span className="shrink-0 flex items-center gap-3 text-sm pe-3">
                         <span className="text-gray-400">{fmt(rawPts)} pts</span>
                         <span className="font-bold">{fibPts} pts</span>
                         {isExpanded ? (
@@ -298,13 +305,6 @@ export default function App() {
                           <ChevronDown className="h-4 w-4" />
                         )}
                       </span>
-                    </button>
-                    <button
-                      onClick={() => requestDeleteTask(i)}
-                      aria-label={`Remove ${task.name}`}
-                      className="shrink-0 pl-4 py-3 text-gray-400 hover:text-black transition-colors"
-                    >
-                      <X className="h-4 w-4" />
                     </button>
                   </div>
 
@@ -398,11 +398,7 @@ export default function App() {
                       key={i}
                       className="flex items-center justify-between gap-2 px-2 py-1 hover:bg-gray-50"
                     >
-                      <span className="text-sm truncate">{t.name}</span>
                       <span className="shrink-0 flex items-center gap-2">
-                        <span className="text-xs font-bold">
-                          {roundUpToFibonacci(getPoints(t.selections))} pts
-                        </span>
                         <button
                           onClick={() => requestDeleteTask(i)}
                           aria-label={`Remove ${t.name}`}
@@ -410,6 +406,10 @@ export default function App() {
                         >
                           <X className="h-4 w-4" />
                         </button>
+                        <span className="text-sm truncate">{t.name}</span>
+                      </span>
+                      <span className="text-xs font-bold">
+                        {roundUpToFibonacci(getPoints(t.selections))} pts
                       </span>
                     </div>
                   ))}
