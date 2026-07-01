@@ -239,13 +239,13 @@ export default function App() {
         </DialogDescription>
         <div className="flex gap-3 justify-end">
           <DialogClose asChild>
-            <button className="border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+            <button className="border border-black px-4 py-2 text-sm hover:bg-gray-100">
               Cancel
             </button>
           </DialogClose>
           <button
             onClick={confirmDeleteTask}
-            className="bg-black text-white px-4 py-2 text-sm hover:bg-gray-800 transition-colors"
+            className="bg-black text-white px-4 py-2 text-sm hover:bg-gray-800"
           >
             Delete
           </button>
@@ -285,12 +285,12 @@ export default function App() {
                     <button
                       onClick={() => requestDeleteTask(i)}
                       aria-label={`Remove ${task.name}`}
-                      className="shrink-0 p-3 text-gray-400 hover:text-black transition-colors"
+                      className="shrink-0 p-3 text-gray-400 hover:text-black"
                     >
                       <X className="h-4 w-4" />
                     </button>
                     <button
-                      className="flex-1 min-w-0 text-left py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      className="flex-1 min-w-0 text-left py-3 flex items-center justify-between hover:bg-gray-50"
                       onClick={() => setExpandedTask(isExpanded ? null : i)}
                     >
                       <span className="font-medium truncate pr-4">
@@ -331,14 +331,14 @@ export default function App() {
           <div className="flex justify-between mt-8">
             <button
               onClick={() => setShowConfirmReset(true)}
-              className="flex items-center gap-2 border border-black px-4 py-2 text-sm hover:bg-black hover:text-white transition-colors"
+              className="flex items-center gap-2 border border-black px-4 py-2 text-sm hover:bg-black hover:text-white"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Start over
             </button>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-2 bg-black text-white px-4 py-2 text-sm hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 bg-black text-white px-4 py-2 text-sm hover:bg-gray-800"
             >
               <Copy className="h-3.5 w-3.5" />
               {copied ? "Copied!" : "Copy list"}
@@ -355,13 +355,13 @@ export default function App() {
             </DialogDescription>
             <div className="flex gap-3 justify-end">
               <DialogClose asChild>
-                <button className="border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                <button className="border border-black px-4 py-2 text-sm hover:bg-gray-100">
                   Cancel
                 </button>
               </DialogClose>
               <button
                 onClick={handleStartOver}
-                className="bg-black text-white px-4 py-2 text-sm hover:bg-gray-800 transition-colors"
+                className="bg-black text-white px-4 py-2 text-sm hover:bg-gray-800"
               >
                 Reset
               </button>
@@ -385,7 +385,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowTaskList((v) => !v)}
-                className="text-sm text-gray-500 underline decoration-dotted underline-offset-2 hover:text-black transition-colors"
+                className="text-sm text-gray-500 underline decoration-dotted underline-offset-2 hover:text-black"
               >
                 {tasks.length} task{tasks.length !== 1 ? "s" : ""} saved
               </button>
@@ -401,7 +401,7 @@ export default function App() {
                         <button
                           onClick={() => requestDeleteTask(i)}
                           aria-label={`Remove ${t.name}`}
-                          className="text-gray-400 hover:text-black transition-colors"
+                          className="text-gray-400 hover:text-black"
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -456,14 +456,14 @@ export default function App() {
           <button
             onClick={saveAndNext}
             disabled={!canSubmit}
-            className="border border-black px-5 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+            className="border border-black px-5 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100"
           >
             Next task
           </button>
           <button
             onClick={handleFinish}
             disabled={!canFinish}
-            className="bg-black text-white px-5 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
+            className="bg-black text-white px-5 py-2 text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-800"
           >
             Finish
           </button>
@@ -486,13 +486,13 @@ export default function App() {
           </DialogDescription>
           <div className="flex gap-3 justify-end">
             <DialogClose asChild>
-              <button className="border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+              <button className="border border-black px-4 py-2 text-sm hover:bg-gray-100">
                 Go back
               </button>
             </DialogClose>
             <button
               onClick={finishSkippingCurrent}
-              className="bg-black text-white px-4 py-2 text-sm hover:bg-gray-800 transition-colors"
+              className="bg-black text-white px-4 py-2 text-sm hover:bg-gray-800"
             >
               Skip and finish
             </button>
