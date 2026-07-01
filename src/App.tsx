@@ -100,7 +100,7 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const taskListRef = useRef<HTMLDivElement>(null);
 
-  // Dismiss the saved-tasks popover when clicking anywhere outside it.
+  // Dismiss the added-tasks popover when clicking anywhere outside it.
   useEffect(() => {
     if (!showTaskList) return;
     function onPointerDown(e: MouseEvent) {
@@ -118,7 +118,7 @@ export default function App() {
   // A task is complete once it has a name and at least one criterion.
   const isEntryComplete = trimmedName.length > 0 && hasSelections;
   const isEntryInProgress = trimmedName.length > 0 || hasSelections;
-  // Finish is allowed whenever there's something to show: a saved task or a
+  // Finish is allowed whenever there's something to show: an added task or a
   // complete current one.
   const canFinish = tasks.length > 0 || isEntryComplete;
 
@@ -145,7 +145,7 @@ export default function App() {
       // Something's been entered but it's incomplete — confirm before dropping it.
       setShowFinishWarning(true);
     } else {
-      // Nothing in progress; finish with the already-saved tasks.
+      // Nothing in progress; finish with the already-added tasks.
       setView("results");
     }
   }
@@ -387,7 +387,7 @@ export default function App() {
                 onClick={() => setShowTaskList((v) => !v)}
                 className="text-sm text-gray-500 underline decoration-dotted underline-offset-2 hover:text-black"
               >
-                {tasks.length} task{tasks.length !== 1 ? "s" : ""} saved
+                {tasks.length} task{tasks.length !== 1 ? "s" : ""} added
               </button>
 
               {showTaskList && (
@@ -482,7 +482,7 @@ export default function App() {
               .filter(Boolean)
               .join(" and ")}
             . Go back to finish it, or skip it and finish with your{" "}
-            {tasks.length} saved task{tasks.length !== 1 ? "s" : ""}.
+            {tasks.length} added task{tasks.length !== 1 ? "s" : ""}.
           </DialogDescription>
           <div className="flex gap-3 justify-end">
             <DialogClose asChild>
