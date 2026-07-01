@@ -378,7 +378,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white text-black font-mono">
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <div className="border-b-2 border-black pb-4 mb-8">
+        <div className="flex row justify-between border-b-2 border-black pb-4 mb-8">
           <h1 className="text-2xl font-bold tracking-tight">Task Estimator</h1>
           {tasks.length > 0 && (
             <div className="relative inline-block mt-1" ref={taskListRef}>
@@ -391,7 +391,7 @@ export default function App() {
               </button>
 
               {showTaskList && (
-                <div className="absolute left-0 top-full z-40 mt-1 w-72 border-2 border-black bg-white p-1 text-left shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+                <div className="absolute right-0 top-full z-40 mt-1 w-72 border-2 border-black bg-white p-1 text-left shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
                   {tasks.map((t, i) => (
                     <div
                       key={i}
