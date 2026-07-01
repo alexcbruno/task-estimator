@@ -387,8 +387,7 @@ export default function App() {
                 onClick={() => setShowTaskList((v) => !v)}
                 className="text-sm text-gray-500 underline decoration-dotted underline-offset-2 hover:text-black transition-colors"
               >
-                {tasks.length} task{tasks.length !== 1 ? "s" : ""} saved — add
-                another
+                {tasks.length} task{tasks.length !== 1 ? "s" : ""} saved
               </button>
 
               {showTaskList && (
