@@ -1,39 +1,39 @@
-import { useState } from 'react'
-import { ChevronDown, ChevronUp, Copy, RotateCcw } from 'lucide-react'
-import { CRITERIA, type Criterion } from './data/criteria'
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Copy, RotateCcw } from "lucide-react";
+import { CRITERIA, type Criterion } from "./data/criteria";
 import {
   getPoints,
   roundUpToFibonacci,
   cn,
   type Intensity,
   type Selections,
-} from './lib/utils'
-import { Checkbox } from './components/ui/checkbox'
+} from "./lib/utils";
+import { Checkbox } from "./components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
   DialogClose,
-} from './components/ui/dialog'
-import './index.css'
+} from "./components/ui/dialog";
+import "./index.css";
 
 interface Task {
-  name: string
-  selections: Selections
+  name: string;
+  selections: Selections;
 }
 
-type View = 'entry' | 'results'
+type View = "entry" | "results";
 
 const INTENSITY_LEVELS: { value: Intensity; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'med', label: 'Med' },
-  { value: 'high', label: 'High' },
-]
+  { value: "low", label: "Low" },
+  { value: "med", label: "Med" },
+  { value: "high", label: "High" },
+];
 
 // Round to at most 2 decimals and drop trailing zeros for display.
 function fmt(n: number): string {
-  return String(Math.round(n * 100) / 100)
+  return String(Math.round(n * 100) / 100);
 }
 
 function CriterionRow({
@@ -42,10 +42,10 @@ function CriterionRow({
   onToggle,
   onSetIntensity,
 }: {
-  criterion: Criterion
-  intensity: Intensity | undefined
-  onToggle: () => void
-  onSetIntensity: (level: Intensity) => void
+  criterion: Criterion;
+  intensity: Intensity | undefined;
+  onToggle: () => void;
+  onSetIntensity: (level: Intensity) => void;
 }) {
   return (
     <div className="flex items-start justify-between gap-3 py-1 min-h-[28px]">
@@ -63,20 +63,20 @@ function CriterionRow({
       {/* Always reserve space for the intensity group so the label wraps consistently. */}
       <div
         className={cn(
-          'shrink-0 flex border border-black',
-          !intensity && 'invisible pointer-events-none'
+          "shrink-0 flex border border-black",
+          !intensity && "invisible pointer-events-none",
         )}
       >
-        {INTENSITY_LEVELS.map(level => (
+        {INTENSITY_LEVELS.map((level) => (
           <button
             key={level.value}
             type="button"
             onClick={() => onSetIntensity(level.value)}
             className={cn(
-              'px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0',
+              "px-2 py-0.5 text-xs uppercase tracking-wide border-l border-black first:border-l-0",
               intensity === level.value
-                ? 'bg-black text-white'
-                : 'bg-white text-black hover:bg-gray-100'
+                ? "bg-black text-white"
+                : "bg-white text-black hover:bg-gray-100",
             )}
           >
             {level.label}
@@ -84,101 +84,103 @@ function CriterionRow({
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export default function App() {
-  const [view, setView] = useState<View>('entry')
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [taskName, setTaskName] = useState('')
-  const [selections, setSelections] = useState<Selections>({})
-  const [expandedTask, setExpandedTask] = useState<number | null>(null)
-  const [showConfirmReset, setShowConfirmReset] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [view, setView] = useState<View>("entry");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskName, setTaskName] = useState("");
+  const [selections, setSelections] = useState<Selections>({});
+  const [expandedTask, setExpandedTask] = useState<number | null>(null);
+  const [showConfirmReset, setShowConfirmReset] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const canSubmit = taskName.trim().length > 0
+  const canSubmit = taskName.trim().length > 0;
 
   function saveAndNext() {
-    setTasks(prev => [...prev, { name: taskName.trim(), selections }])
-    setTaskName('')
-    setSelections({})
+    setTasks((prev) => [...prev, { name: taskName.trim(), selections }]);
+    setTaskName("");
+    setSelections({});
   }
 
   function saveAndFinish() {
-    const finalTasks = [...tasks, { name: taskName.trim(), selections }]
-    setTasks(finalTasks)
-    setView('results')
+    const finalTasks = [...tasks, { name: taskName.trim(), selections }];
+    setTasks(finalTasks);
+    setView("results");
   }
 
   // Toggle a criterion in the in-progress entry. Defaults to "high" when checked.
   function toggleCriterion(id: string) {
-    setSelections(prev => {
+    setSelections((prev) => {
       if (prev[id]) {
-        const { [id]: _removed, ...rest } = prev
-        return rest
+        const { [id]: _removed, ...rest } = prev;
+        return rest;
       }
-      return { ...prev, [id]: 'high' }
-    })
+      return { ...prev, [id]: "low" };
+    });
   }
 
   function setIntensity(id: string, level: Intensity) {
-    setSelections(prev => ({ ...prev, [id]: level }))
+    setSelections((prev) => ({ ...prev, [id]: level }));
   }
 
   function toggleTaskCriterion(taskIndex: number, id: string) {
-    setTasks(prev =>
+    setTasks((prev) =>
       prev.map((task, i) => {
-        if (i !== taskIndex) return task
+        if (i !== taskIndex) return task;
         if (task.selections[id]) {
-          const { [id]: _removed, ...rest } = task.selections
-          return { ...task, selections: rest }
+          const { [id]: _removed, ...rest } = task.selections;
+          return { ...task, selections: rest };
         }
-        return { ...task, selections: { ...task.selections, [id]: 'high' } }
-      })
-    )
+        return { ...task, selections: { ...task.selections, [id]: "high" } };
+      }),
+    );
   }
 
   function setTaskIntensity(taskIndex: number, id: string, level: Intensity) {
-    setTasks(prev =>
+    setTasks((prev) =>
       prev.map((task, i) =>
         i === taskIndex
           ? { ...task, selections: { ...task.selections, [id]: level } }
-          : task
-      )
-    )
+          : task,
+      ),
+    );
   }
 
   function handleCopy() {
-    const lines = tasks.map(task => {
-      const fib = roundUpToFibonacci(getPoints(task.selections))
-      return `${task.name}: ${fib}`
-    })
-    navigator.clipboard.writeText(lines.join('\n'))
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    const lines = tasks.map((task) => {
+      const fib = roundUpToFibonacci(getPoints(task.selections));
+      return `${task.name}: ${fib}`;
+    });
+    navigator.clipboard.writeText(lines.join("\n"));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   function handleStartOver() {
-    setTasks([])
-    setTaskName('')
-    setSelections({})
-    setExpandedTask(null)
-    setShowConfirmReset(false)
-    setView('entry')
+    setTasks([]);
+    setTaskName("");
+    setSelections({});
+    setExpandedTask(null);
+    setShowConfirmReset(false);
+    setView("entry");
   }
 
   // ── Results view ──────────────────────────────────────────────────────────────
-  if (view === 'results') {
+  if (view === "results") {
     const totalFib = tasks.reduce(
       (sum, t) => sum + roundUpToFibonacci(getPoints(t.selections)),
-      0
-    )
+      0,
+    );
 
     return (
       <div className="min-h-screen bg-white text-black font-mono">
         <div className="max-w-2xl mx-auto px-6 py-10">
           <div className="border-b-2 border-black pb-4 mb-6">
-            <h1 className="text-2xl font-bold tracking-tight">Estimation Results</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Estimation Results
+            </h1>
           </div>
 
           <div className="text-xs uppercase tracking-widest mb-1">Total</div>
@@ -186,9 +188,9 @@ export default function App() {
 
           <div className="border-t-2 border-black">
             {tasks.map((task, i) => {
-              const rawPts = getPoints(task.selections)
-              const fibPts = roundUpToFibonacci(rawPts)
-              const isExpanded = expandedTask === i
+              const rawPts = getPoints(task.selections);
+              const fibPts = roundUpToFibonacci(rawPts);
+              const isExpanded = expandedTask === i;
 
               return (
                 <div key={i} className="border-b border-black">
@@ -196,7 +198,9 @@ export default function App() {
                     className="w-full text-left px-0 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     onClick={() => setExpandedTask(isExpanded ? null : i)}
                   >
-                    <span className="font-medium truncate pr-4">{task.name}</span>
+                    <span className="font-medium truncate pr-4">
+                      {task.name}
+                    </span>
                     <span className="shrink-0 flex items-center gap-3 text-sm">
                       <span className="text-gray-400">{fmt(rawPts)} pts</span>
                       <span className="font-bold">{fibPts} pts</span>
@@ -210,13 +214,13 @@ export default function App() {
 
                   {isExpanded && (
                     <div className="pb-4 pt-2 px-4 space-y-1 border-t border-dashed border-black bg-gray-50">
-                      {CRITERIA.map(criterion => (
+                      {CRITERIA.map((criterion) => (
                         <CriterionRow
                           key={criterion.id}
                           criterion={criterion}
                           intensity={task.selections[criterion.id]}
                           onToggle={() => toggleTaskCriterion(i, criterion.id)}
-                          onSetIntensity={level =>
+                          onSetIntensity={(level) =>
                             setTaskIntensity(i, criterion.id, level)
                           }
                         />
@@ -224,7 +228,7 @@ export default function App() {
                     </div>
                   )}
                 </div>
-              )
+              );
             })}
           </div>
 
@@ -241,7 +245,7 @@ export default function App() {
               className="flex items-center gap-2 bg-black text-white px-4 py-2 text-sm hover:bg-gray-800 transition-colors"
             >
               <Copy className="h-3.5 w-3.5" />
-              {copied ? 'Copied!' : 'Copy list'}
+              {copied ? "Copied!" : "Copy list"}
             </button>
           </div>
         </div>
@@ -250,7 +254,8 @@ export default function App() {
           <DialogContent>
             <DialogTitle>Start over?</DialogTitle>
             <DialogDescription>
-              All {tasks.length} task{tasks.length !== 1 ? 's' : ''} will be deleted. This cannot be undone.
+              All {tasks.length} task{tasks.length !== 1 ? "s" : ""} will be
+              deleted. This cannot be undone.
             </DialogDescription>
             <div className="flex gap-3 justify-end">
               <DialogClose asChild>
@@ -268,7 +273,7 @@ export default function App() {
           </DialogContent>
         </Dialog>
       </div>
-    )
+    );
   }
 
   // ── Entry view ────────────────────────────────────────────────────────────────
@@ -279,7 +284,8 @@ export default function App() {
           <h1 className="text-2xl font-bold tracking-tight">Task Estimator</h1>
           {tasks.length > 0 && (
             <p className="text-sm mt-1 text-gray-500">
-              {tasks.length} task{tasks.length !== 1 ? 's' : ''} saved — add another
+              {tasks.length} task{tasks.length !== 1 ? "s" : ""} saved — add
+              another
             </p>
           )}
         </div>
@@ -291,9 +297,9 @@ export default function App() {
           <input
             type="text"
             value={taskName}
-            onChange={e => setTaskName(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && canSubmit) saveAndNext()
+            onChange={(e) => setTaskName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && canSubmit) saveAndNext();
             }}
             placeholder="Enter task title..."
             className="w-full border-2 border-black px-3 py-2.5 text-sm focus:outline-none focus:bg-gray-50 font-mono placeholder:text-gray-400"
@@ -306,13 +312,13 @@ export default function App() {
             Criteria
           </label>
           <div className="space-y-1">
-            {CRITERIA.map(criterion => (
+            {CRITERIA.map((criterion) => (
               <CriterionRow
                 key={criterion.id}
                 criterion={criterion}
                 intensity={selections[criterion.id]}
                 onToggle={() => toggleCriterion(criterion.id)}
-                onSetIntensity={level => setIntensity(criterion.id, level)}
+                onSetIntensity={(level) => setIntensity(criterion.id, level)}
               />
             ))}
           </div>
@@ -336,5 +342,5 @@ export default function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }
